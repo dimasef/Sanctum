@@ -67,8 +67,8 @@ cd client && npm test
 
 ## Roadmap
 
-- [ ] 0. Setup: monorepo, TS, linters, docker-compose with Postgres
-- [ ] 1. DB: Prisma schema (User, Book, Shelf, Review), migrations, seeds
+- [x] 0. Setup: monorepo, TS, linters, docker-compose with Postgres
+- [x] 1. DB: Prisma schema (User, Book, Shelf, Review), migrations, seeds
 - [ ] 2. GraphQL API: types, queries, mutations, resolvers
 - [ ] 3. Auth: register/login, JWT + refresh, resolver guards
 - [ ] 4. Google Books: search and import books
