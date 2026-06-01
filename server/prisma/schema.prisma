@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ShelfStatus {
+  WANT_TO_READ
+  READING
+  READ
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  bio          String?
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+
+  shelves       Shelf[]
+  reviews       Review[]
+  refreshTokens RefreshToken[]
+}
+
+model Book {
+  id            String   @id @default(uuid())
+  googleId      String   @unique
+  title         String
+  authors       String[]
+  description   String?
+  coverUrl      String?
+  publishedYear Int?
+  isbn          String?
+
+  shelves Shelf[]
+  reviews Review[]
+}
+
+model Shelf {
+  id      String      @id @default(uuid())
+  status  ShelfStatus
+  addedAt DateTime    @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int
+  body      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
