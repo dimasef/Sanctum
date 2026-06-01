@@ -46,10 +46,35 @@ export const typeDefs = `#graphql
     book: Book!
   }
 
+  type AuthPayload {
+    accessToken: String!
+    refreshToken: String!
+    user: User!
+  }
+  
+  input RegisterInput {
+    email: String!
+    password: String!
+    name: String!
+  }
+
+  input LoginInput {
+    email: String!
+    password: String!
+  }
+
   type Query {
+    me: User
     books: [Book!]!
     book(id: ID!): Book
     users: [User!]!
     user(id: ID!): User
+  }
+
+  type Mutation {
+    register(input: RegisterInput!): AuthPayload!
+    login(input: LoginInput!): AuthPayload!
+    refreshToken(token: String!): AuthPayload!
+    logout(token: String!): Boolean!
   }
 `;

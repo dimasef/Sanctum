@@ -1,14 +1,30 @@
 import type { Book, Review, Shelf, User } from './generated/prisma/client.js';
 import type { Context } from './context.js';
+import * as authService from './auth/auth.service.js';
 
 export const resolvers = {
   Query: {
+    me: async (_parent: unknown, _args: unknown, ctx: Context) => {
+      if (!ctx.userId) return null;
+      return ctx.prisma.user.findUnique({ where: { id: ctx.userId } });
+    },
     books: async (_parent: unknown, _args: unknown, ctx: Context) => ctx.prisma.book.findMany(),
     book: async (_parent: unknown, args: { id: string }, ctx: Context) =>
       ctx.prisma.book.findUnique({ where: { id: args.id } }),
     users: async (_parent: unknown, _args: unknown, ctx: Context) => ctx.prisma.user.findMany(),
     user: async (_parent: unknown, args: { id: string }, ctx: Context) =>
       ctx.prisma.user.findUnique({ where: { id: args.id } }),
+  },
+
+  Mutation: {
+    register: (
+      _parent: unknown,
+      args: { input: { email: string; password: string; name: string } },
+    ) => authService.register(args.input),
+    login: (_parent: unknown, args: { input: { email: string; password: string } }) =>
+      authService.login(args.input),
+    refreshToken: (_parent: unknown, args: { token: string }) => authService.refresh(args.token),
+    logout: (_parent: unknown, args: { token: string }) => authService.logout(args.token),
   },
 
   User: {

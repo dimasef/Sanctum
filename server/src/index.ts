@@ -17,7 +17,7 @@ async function startServer(): Promise<void> {
     cors(),
     express.json(),
     expressMiddleware(server, {
-      context: async () => createContext(),
+      context: async ({ req }) => createContext(req),
     }),
   );
 

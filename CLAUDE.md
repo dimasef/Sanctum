@@ -70,7 +70,7 @@ cd client && npm test
 - [x] 0. Setup: monorepo, TS, linters, docker-compose with Postgres
 - [x] 1. DB: Prisma schema (User, Book, Shelf, Review), migrations, seeds
 - [x] 2. GraphQL API: types, queries, mutations, resolvers
-- [ ] 3. Auth: register/login, JWT + refresh, resolver guards
+- [x] 3. Auth: register/login, JWT + refresh, resolver guards
 - [ ] 4. Google Books: search and import books
 - [ ] 5. DataLoader: fix N+1 on relations
 - [ ] 6. React UI: Apollo Client, pages, shelves
