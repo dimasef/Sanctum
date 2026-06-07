@@ -6,7 +6,7 @@ configured from the environment, and behaves identically in every environment.
 
 ## The 12 factors
 
-| # | Factor | Essence | In BookShelf |
+| # | Factor | Essence | In Sanctum |
 |---|---|---|---|
 | 1 | Codebase | One repo, many deploys | our git repo |
 | 2 | Dependencies | Explicitly declared & isolated | `package.json` + lockfile |

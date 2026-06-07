@@ -1,38 +1,23 @@
-import { gql, type TypedDocumentNode } from '@apollo/client';
-import { useQuery } from '@apollo/client/react';
-import { Container, List, ListItem, ListItemText, Typography } from '@mui/material';
-import './App.css';
-
-type BooksData = { books: { id: string; title: string }[] };
-
-const BOOKS: TypedDocumentNode<BooksData> = gql`
-  query Books {
-    books {
-      id
-      title
-    }
-  }
-`;
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout.tsx';
+import ProtectedRoute from './components/ProtectedRoute.tsx';
+import BooksPage from './pages/BooksPage.tsx';
+import LoginPage from './pages/LoginPage.tsx';
+import ShelfPage from './pages/ShelfPage.tsx';
 
 function App() {
-  const { data, loading, error } = useQuery(BOOKS);
-
-  if (loading) return <p>Loading…</p>;
-  if (error) return <p>Error: {error.message}</p>;
-
   return (
-    <Container maxWidth="sm">
-      <Typography variant="h4" gutterBottom>
-        Books
-      </Typography>
-      <List>
-        {data?.books.map((b) => (
-          <ListItem key={b.id}>
-            <ListItemText primary={b.title} />
-          </ListItem>
-        ))}
-      </List>
-    </Container>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<BooksPage />} />
+          <Route path="login" element={<LoginPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="shelf" element={<ShelfPage />} />
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

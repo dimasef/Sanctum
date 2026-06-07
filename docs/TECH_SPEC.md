@@ -1,4 +1,4 @@
-# Technical Specification — BookShelf
+# Technical Specification — Sanctum
 
 > Version 1.0 · Learning fullstack project for work/interview preparation.
 

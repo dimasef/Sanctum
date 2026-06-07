@@ -1,11 +1,13 @@
 # CLAUDE.md
 
-Guide for Claude Code (and for the developer) for the **BookShelf** project.
+Guide for Claude Code (and for the developer) for the **Sanctum** project.
 Read at the start of every session. Keep it up to date.
 
 ## What this project is
 
-BookShelf is a personal book library with social features. It's a learning
+Sanctum (tagline: *your private library*) is a personal book library with social
+features — the experience should feel like stepping into a cozy, lamp-lit room
+steeped in history, a quiet world of books. It's a learning
 fullstack project built to prepare for work / technical interviews. The goal is a
 production-like application: with tests, clean architecture, and CI/CD.
 

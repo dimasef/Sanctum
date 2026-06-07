@@ -23,7 +23,7 @@ async function startServer(): Promise<void> {
 
   const port = Number(process.env.PORT) || 4000;
   app.listen(port, () => {
-    console.log(`🚀 BookShelf API ready at http://localhost:${port}/graphql`);
+    console.log(`🚀 Sanctum API ready at http://localhost:${port}/graphql`);
   });
 }
 

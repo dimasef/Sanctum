@@ -1,4 +1,4 @@
-# Database cheatsheet — inspecting BookShelf data
+# Database cheatsheet — inspecting Sanctum data
 
 Local Postgres runs in Docker (`docker compose up -d`), container `bookshelf-db`,
 database/user/password all `bookshelf`.

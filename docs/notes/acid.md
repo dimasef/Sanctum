@@ -7,7 +7,7 @@ operations that must succeed or fail as one unit).
 "All or nothing." Every operation in the transaction commits, or none does. On error
 midway → **rollback** to the original state.
 
-> In BookShelf: token rotation in `refresh` (`auth.service.ts`) wraps "revoke old
+> In Sanctum: token rotation in `refresh` (`auth.service.ts`) wraps "revoke old
 > refresh token" + "create new one" in `prisma.$transaction`. If the create fails,
 > the revoke is rolled back — no "revoked but not reissued" state.
 
@@ -15,7 +15,7 @@ midway → **rollback** to the original state.
 A transaction moves the DB from one **valid** state to another, never violating
 integrity rules (constraints, foreign keys, unique, types).
 
-> In BookShelf: `@@unique([userId, bookId])`, FK `userId → User`, `@unique` on email.
+> In Sanctum: `@@unique([userId, bookId])`, FK `userId → User`, `@unique` on email.
 > A transaction that would break them never commits — the DB rejects it. The earlier
 > `tokenHash` duplicate bug was consistency doing its job.
 
