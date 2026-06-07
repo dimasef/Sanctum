@@ -88,5 +88,10 @@ export const typeDefs = `#graphql
     refreshToken(token: String!): AuthPayload!
     logout(token: String!): Boolean!
     importBook(googleId: String!): Book!
+    addToShelf(bookId: ID!, status: ShelfStatus!): ShelfItem!
+    moveOnShelf(bookId: ID!, status: ShelfStatus!): ShelfItem!
+    removeFromShelf(bookId: ID!): Boolean!
+    upsertReview(bookId: ID!, rating: Int!, body: String): Review!
+    deleteReview(bookId: ID!): Boolean!
   }
 `;

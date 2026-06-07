@@ -1,7 +1,9 @@
 import * as googleBooks from './books/googleBooks.js';
 import * as bookService from './books/book.service.js';
+import * as shelfService from './shelf/shelf.service.js';
+import * as reviewService from './reviews/review.service.js';
 import { requireUserId } from './auth/guard.js';
-import type { Book, Review, Shelf, User } from './generated/prisma/client.js';
+import type { Book, Review, Shelf, User, ShelfStatus } from './generated/prisma/client.js';
 import type { Context } from './context.js';
 import * as authService from './auth/auth.service.js';
 
@@ -33,6 +35,19 @@ export const resolvers = {
       requireUserId(ctx);
       return bookService.importBook(args.googleId);
     },
+    addToShelf: (_p: unknown, args: { bookId: string; status: ShelfStatus }, ctx: Context) =>
+      shelfService.addToShelf(requireUserId(ctx), args.bookId, args.status),
+    moveOnShelf: (_p: unknown, args: { bookId: string; status: ShelfStatus }, ctx: Context) =>
+      shelfService.moveOnShelf(requireUserId(ctx), args.bookId, args.status),
+    removeFromShelf: (_p: unknown, args: { bookId: string }, ctx: Context) =>
+      shelfService.removeFromShelf(requireUserId(ctx), args.bookId),
+    upsertReview: (
+      _p: unknown,
+      args: { bookId: string; rating: number; body?: string | null },
+      ctx: Context,
+    ) => reviewService.upsertReview(requireUserId(ctx), args.bookId, args.rating, args.body),
+    deleteReview: (_p: unknown, args: { bookId: string }, ctx: Context) =>
+      reviewService.deleteReview(requireUserId(ctx), args.bookId),
   },
 
   User: {
