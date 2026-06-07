@@ -1,3 +1,6 @@
+import * as googleBooks from './books/googleBooks.js';
+import * as bookService from './books/book.service.js';
+import { requireUserId } from './auth/guard.js';
 import type { Book, Review, Shelf, User } from './generated/prisma/client.js';
 import type { Context } from './context.js';
 import * as authService from './auth/auth.service.js';
@@ -14,6 +17,7 @@ export const resolvers = {
     users: async (_parent: unknown, _args: unknown, ctx: Context) => ctx.prisma.user.findMany(),
     user: async (_parent: unknown, args: { id: string }, ctx: Context) =>
       ctx.prisma.user.findUnique({ where: { id: args.id } }),
+    searchBooks: (_p: unknown, args: { query: string }) => googleBooks.searchBooks(args.query),
   },
 
   Mutation: {
@@ -25,6 +29,10 @@ export const resolvers = {
       authService.login(args.input),
     refreshToken: (_parent: unknown, args: { token: string }) => authService.refresh(args.token),
     logout: (_parent: unknown, args: { token: string }) => authService.logout(args.token),
+    importBook: (_p: unknown, args: { googleId: string }, ctx: Context) => {
+      requireUserId(ctx);
+      return bookService.importBook(args.googleId);
+    },
   },
 
   User: {

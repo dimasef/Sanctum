@@ -63,12 +63,23 @@ export const typeDefs = `#graphql
     password: String!
   }
 
+  type BookSearchResult {
+    googleId: String!
+    title: String!
+    authors: [String!]!
+    description: String
+    coverUrl: String
+    publishedYear: Int
+    isbn: String
+  }
+
   type Query {
     me: User
     books: [Book!]!
     book(id: ID!): Book
     users: [User!]!
     user(id: ID!): User
+    searchBooks(query: String!): [BookSearchResult!]!
   }
 
   type Mutation {
@@ -76,5 +87,6 @@ export const typeDefs = `#graphql
     login(input: LoginInput!): AuthPayload!
     refreshToken(token: String!): AuthPayload!
     logout(token: String!): Boolean!
+    importBook(googleId: String!): Book!
   }
 `;
