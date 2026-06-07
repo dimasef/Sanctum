@@ -37,28 +37,23 @@ export const resolvers = {
 
   User: {
     createdAt: (parent: User) => parent.createdAt.toISOString(),
-    shelf: (parent: User, _a: unknown, ctx: Context) =>
-      ctx.prisma.shelf.findMany({ where: { userId: parent.id } }),
+    shelf: (parent: User, _a: unknown, ctx: Context) => ctx.loaders.shelvesByUserId.load(parent.id),
     reviews: (parent: User, _a: unknown, ctx: Context) =>
-      ctx.prisma.review.findMany({ where: { userId: parent.id } }),
+      ctx.loaders.reviewsByUserId.load(parent.id),
   },
   Book: {
     reviews: (parent: Book, _a: unknown, ctx: Context) =>
-      ctx.prisma.review.findMany({ where: { bookId: parent.id } }),
+      ctx.loaders.reviewsByBookId.load(parent.id),
   },
   ShelfItem: {
     addedAt: (parent: Shelf) => parent.addedAt.toISOString(),
-    user: (parent: Shelf, _a: unknown, ctx: Context) =>
-      ctx.prisma.user.findUnique({ where: { id: parent.userId } }),
-    book: (parent: Shelf, _a: unknown, ctx: Context) =>
-      ctx.prisma.book.findUnique({ where: { id: parent.bookId } }),
+    user: (parent: Shelf, _a: unknown, ctx: Context) => ctx.loaders.userById.load(parent.userId),
+    book: (parent: Shelf, _a: unknown, ctx: Context) => ctx.loaders.bookById.load(parent.bookId),
   },
   Review: {
     createdAt: (parent: Review) => parent.createdAt.toISOString(),
     updatedAt: (parent: Review) => parent.updatedAt.toISOString(),
-    user: (parent: Review, _a: unknown, ctx: Context) =>
-      ctx.prisma.user.findUnique({ where: { id: parent.userId } }),
-    book: (parent: Review, _a: unknown, ctx: Context) =>
-      ctx.prisma.book.findUnique({ where: { id: parent.bookId } }),
+    user: (parent: Review, _a: unknown, ctx: Context) => ctx.loaders.userById.load(parent.userId),
+    book: (parent: Review, _a: unknown, ctx: Context) => ctx.loaders.bookById.load(parent.bookId),
   },
 };

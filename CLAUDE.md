@@ -72,7 +72,7 @@ cd client && npm test
 - [x] 2. GraphQL API: types, queries, mutations, resolvers
 - [x] 3. Auth: register/login, JWT + refresh, resolver guards
 - [x] 4. Google Books: search and import books
-- [ ] 5. DataLoader: fix N+1 on relations
+- [x] 5. DataLoader: fix N+1 on relations
 - [ ] 6. React UI: Apollo Client, pages, shelves
 - [ ] 7. S3: cover/avatar uploads
 - [ ] 8. Tests: backend + frontend

@@ -4,4 +4,4 @@ import { config } from './config.js';
 
 const adapter = new PrismaPg({ connectionString: config.databaseUrl });
 
-export const prisma = new PrismaClient({ adapter });
+export const prisma = new PrismaClient({ adapter, log: config.isDev ? ['query'] : [] });

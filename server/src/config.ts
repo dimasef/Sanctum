@@ -12,6 +12,8 @@ export const config = {
   port: Number(process.env.PORT) || 4000,
   databaseUrl: required('DATABASE_URL'),
   googleBooksApiKey: required('GOOGLE_BOOKS_API_KEY'),
+  nodeEnv: process.env.NODE_ENV ?? 'development',
+  isDev: (process.env.NODE_ENV ?? 'development') !== 'production',
   jwt: {
     accessSecret: required('JWT_ACCESS_SECRET'),
     refreshSecret: required('JWT_REFRESH_SECRET'),

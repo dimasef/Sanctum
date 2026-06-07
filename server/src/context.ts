@@ -1,10 +1,12 @@
 import type { Request } from 'express';
 import { prisma } from './prisma.js';
 import { verifyAccessToken } from './auth/tokens.js';
+import { createLoaders, type Loaders } from './loaders.js';
 
 export interface Context {
   prisma: typeof prisma;
   userId: string | null;
+  loaders: Loaders;
 }
 
 function extractUserId(req: Request): string | null {
@@ -21,5 +23,9 @@ function extractUserId(req: Request): string | null {
 }
 
 export function createContext(req: Request): Context {
-  return { prisma, userId: extractUserId(req) };
+  return {
+    prisma,
+    userId: extractUserId(req),
+    loaders: createLoaders(prisma),
+  };
 }
