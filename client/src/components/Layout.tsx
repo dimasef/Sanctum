@@ -14,6 +14,7 @@ import DarkModeIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeIcon from '@mui/icons-material/LightModeOutlined';
 import { useColorMode } from '../theme/colorMode.ts';
 import { useAuth } from '../auth/authContext.ts';
+import sanctumBackground from '../assets/bg.png';
 
 function Layout() {
   const { mode, toggle } = useColorMode();
@@ -22,10 +23,8 @@ function Layout() {
 
   const isAuthenticated = status === 'authenticated';
 
-  const navItems = [
-    { label: 'Books', to: '/' },
-    ...(isAuthenticated ? [{ label: 'My Shelf', to: '/shelf' }] : []),
-  ];
+  // The logo links home, so the only persistent nav target is the shelf.
+  const navItems = isAuthenticated ? [{ label: 'My Shelf', to: '/shelf' }] : [];
 
   const handleLogout = async () => {
     await logout();
@@ -33,8 +32,30 @@ function Layout() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <AppBar position="sticky">
+    <Box
+      sx={(theme) => ({
+        minHeight: '100vh',
+        // The da Vinci "scholar's sanctum" sets the lamp-lit mood; a mode-aware
+        // scrim keeps it dim enough for text/cards to stay readable on top.
+        backgroundImage: `${
+          theme.palette.mode === 'dark'
+            ? 'linear-gradient(rgba(15,17,19,0.82), rgba(15,17,19,0.93))'
+            : 'linear-gradient(rgba(245,242,234,0.80), rgba(245,242,234,0.92))'
+        }, url(${sanctumBackground})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center top',
+        backgroundAttachment: 'fixed',
+      })}
+    >
+      <AppBar
+        position="sticky"
+        sx={(theme) => ({
+          backgroundColor:
+            theme.palette.mode === 'dark' ? 'rgba(20,24,26,0.65)' : 'rgba(255,253,248,0.70)',
+          backgroundImage: 'none',
+          backdropFilter: 'blur(10px)',
+        })}
+      >
         <Toolbar>
           <Typography
             variant="h6"
