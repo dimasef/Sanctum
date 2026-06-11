@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { gql, type TypedDocumentNode } from '@apollo/client';
 import { useQuery } from '@apollo/client/react';
 import {
@@ -17,6 +18,35 @@ interface Book {
   authors: string[];
   coverUrl: string | null;
   publishedYear: number | null;
+}
+
+const coverPlaceholderSx = {
+  height: 240,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  bgcolor: 'action.hover',
+  fontSize: 56,
+} as const;
+
+// Render the cover, falling back to the placeholder both when there is no URL
+// and when the image fails to load (broken/expired Google Books links).
+function BookCover({ book }: { book: Book }) {
+  const [failed, setFailed] = useState(false);
+
+  if (!book.coverUrl || failed) {
+    return <Box sx={coverPlaceholderSx}>📖</Box>;
+  }
+
+  return (
+    <CardMedia
+      component="img"
+      image={book.coverUrl}
+      alt={book.title}
+      onError={() => setFailed(true)}
+      sx={{ height: 240, objectFit: 'cover' }}
+    />
+  );
 }
 interface BooksData {
   books: Book[];
@@ -79,27 +109,7 @@ function BooksPage() {
               '&:hover': { transform: 'translateY(-4px)', boxShadow: 6 },
             }}
           >
-            {book.coverUrl ? (
-              <CardMedia
-                component="img"
-                image={book.coverUrl}
-                alt={book.title}
-                sx={{ height: 240, objectFit: 'cover' }}
-              />
-            ) : (
-              <Box
-                sx={{
-                  height: 240,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  bgcolor: 'action.hover',
-                  fontSize: 56,
-                }}
-              >
-                📖
-              </Box>
-            )}
+            <BookCover book={book} />
 
             <CardContent sx={{ flexGrow: 1 }}>
               <Typography variant="h6" gutterBottom>
