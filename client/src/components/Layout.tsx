@@ -1,4 +1,4 @@
-import { AppBar, Box, Container, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
+import { AppBar, Avatar, Box, Container, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
 import { Link as RouterLink, Outlet, useNavigate } from 'react-router-dom';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import DarkModeIcon from '@mui/icons-material/DarkModeOutlined';
@@ -53,16 +53,41 @@ function Layout() {
 
           {isAuthenticated ? (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography
-                variant="body2"
+              <Box
+                component={RouterLink}
+                to="/profile"
                 sx={{
-                  color: 'text.secondary',
-                  fontStyle: 'italic',
-                  display: { xs: 'none', sm: 'block' },
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  textDecoration: 'none',
                 }}
               >
-                {user?.name}
-              </Typography>
+                <Avatar
+                  src={user?.avatarUrl ?? undefined}
+                  alt={user?.name}
+                  sx={{
+                    width: 30,
+                    height: 30,
+                    fontSize: '0.85rem',
+                    bgcolor: 'background.default',
+                    color: 'gilt.main',
+                    border: (theme) => `1.5px solid ${theme.palette.gilt.main}`,
+                  }}
+                >
+                  {user?.name?.[0]?.toUpperCase()}
+                </Avatar>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'text.secondary',
+                    fontStyle: 'italic',
+                    display: { xs: 'none', sm: 'block' },
+                  }}
+                >
+                  {user?.name}
+                </Typography>
+              </Box>
               <NavItem
                 to="/"
                 onClick={(e) => {

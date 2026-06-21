@@ -28,7 +28,7 @@ function toOne<T extends { id: string }>(
   });
 }
 
-export function createLoaders(prisma: PrismaClient) {
+export function createLoaders(prisma: PrismaClient, userId: string | null) {
   return {
     reviewsByBookId: oneToMany(
       (ids) => prisma.review.findMany({ where: { bookId: { in: ids } } }),
@@ -44,6 +44,15 @@ export function createLoaders(prisma: PrismaClient) {
     ),
     userById: toOne((ids) => prisma.user.findMany({ where: { id: { in: ids } } })),
     bookById: toOne((ids) => prisma.book.findMany({ where: { id: { in: ids } } })),
+    coverOverrideByBookId: new DataLoader<string, string | null>(async (bookIds) => {
+      if (!userId) return bookIds.map(() => null);
+      const rows = await prisma.bookCover.findMany({
+        where: { userId, bookId: { in: [...bookIds] } },
+        select: { bookId: true, coverUrl: true },
+      });
+      const byBookId = new Map(rows.map((r) => [r.bookId, r.coverUrl]));
+      return bookIds.map((id) => byBookId.get(id) ?? null);
+    }),
   };
 }
 

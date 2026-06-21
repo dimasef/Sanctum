@@ -26,6 +26,7 @@ export const typeDefs = `#graphql
     publishedYear: Int
     isbn: String
     reviews: [Review!]!
+    hasCustomCover: Boolean!
   }
 
   type ShelfItem {
@@ -50,6 +51,17 @@ export const typeDefs = `#graphql
     accessToken: String!
     refreshToken: String!
     user: User!
+  }
+
+  type UploadUrl {
+    uploadUrl: String!
+    publicUrl: String!
+  }
+
+  input UpdateProfileInput {
+    name: String
+    bio: String
+    avatarUrl: String
   }
   
   input RegisterInput {
@@ -93,5 +105,10 @@ export const typeDefs = `#graphql
     removeFromShelf(bookId: ID!): Boolean!
     upsertReview(bookId: ID!, rating: Int!, body: String): Review!
     deleteReview(bookId: ID!): Boolean!
+    updateProfile(input: UpdateProfileInput!): User!
+    requestAvatarUploadUrl(contentType: String!): UploadUrl!
+    requestCoverUploadUrl(bookId: ID!, contentType: String!): UploadUrl!
+    setBookCover(bookId: ID!, coverUrl: String!): Book!
+    removeBookCover(bookId: ID!): Book!
   }
 `;

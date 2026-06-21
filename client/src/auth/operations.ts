@@ -13,6 +13,7 @@ export const ME: TypedDocumentNode<{ me: AuthUser | null }, Record<string, never
       id
       email
       name
+      avatarUrl
     }
   }
 `;
@@ -29,6 +30,7 @@ export const LOGIN: TypedDocumentNode<
         id
         email
         name
+        avatarUrl
       }
     }
   }
@@ -43,6 +45,7 @@ export const REGISTER: TypedDocumentNode<{ register: AuthPayload }, { input: Reg
         id
         email
         name
+        avatarUrl
       }
     }
   }

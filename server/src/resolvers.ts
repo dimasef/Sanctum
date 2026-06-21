@@ -6,6 +6,8 @@ import { requireUserId } from './auth/guard.js';
 import type { Book, Review, Shelf, User, ShelfStatus } from './generated/prisma/client.js';
 import type { Context } from './context.js';
 import * as authService from './auth/auth.service.js';
+import * as s3Service from './storage/s3.service.js';
+import * as userService from './user/user.service.js';
 
 export const resolvers = {
   Query: {
@@ -48,6 +50,28 @@ export const resolvers = {
     ) => reviewService.upsertReview(requireUserId(ctx), args.bookId, args.rating, args.body),
     deleteReview: (_p: unknown, args: { bookId: string }, ctx: Context) =>
       reviewService.deleteReview(requireUserId(ctx), args.bookId),
+    requestAvatarUploadUrl: (_p: unknown, args: { contentType: string }, ctx: Context) =>
+      s3Service.createAvatarUploadUrl(requireUserId(ctx), args.contentType),
+    updateProfile: (
+      _p: unknown,
+      args: { input: { name?: string; bio?: string | null; avatarUrl?: string | null } },
+      ctx: Context,
+    ) => userService.updateProfile(requireUserId(ctx), args.input),
+    requestCoverUploadUrl: (
+      _p: unknown,
+      args: { bookId: string; contentType: string },
+      ctx: Context,
+    ) => s3Service.createCoverUploadUrl(requireUserId(ctx), args.bookId, args.contentType),
+    setBookCover: async (_p: unknown, args: { bookId: string; coverUrl: string }, ctx: Context) => {
+      await bookService.setBookCover(requireUserId(ctx), args.bookId, args.coverUrl);
+      ctx.loaders.coverOverrideByBookId.clear(args.bookId);
+      return ctx.prisma.book.findUnique({ where: { id: args.bookId } });
+    },
+    removeBookCover: async (_p: unknown, args: { bookId: string }, ctx: Context) => {
+      await bookService.removeBookCover(requireUserId(ctx), args.bookId);
+      ctx.loaders.coverOverrideByBookId.clear(args.bookId);
+      return ctx.prisma.book.findUnique({ where: { id: args.bookId } });
+    },
   },
 
   User: {
@@ -57,6 +81,15 @@ export const resolvers = {
       ctx.loaders.reviewsByUserId.load(parent.id),
   },
   Book: {
+    coverUrl: async (parent: Book, _a: unknown, ctx: Context) => {
+      if (!ctx.userId) return parent.coverUrl;
+      const override = await ctx.loaders.coverOverrideByBookId.load(parent.id);
+      return override ?? parent.coverUrl;
+    },
+    hasCustomCover: async (parent: Book, _a: unknown, ctx: Context) => {
+      if (!ctx.userId) return false;
+      return (await ctx.loaders.coverOverrideByBookId.load(parent.id)) !== null;
+    },
     reviews: (parent: Book, _a: unknown, ctx: Context) =>
       ctx.loaders.reviewsByBookId.load(parent.id),
   },

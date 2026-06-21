@@ -26,9 +26,6 @@ export const CoverPane = styled('div')(({ theme }) => ({
   aspectRatio: '2 / 3',
   borderRadius: '3px 8px 8px 3px',
   overflow: 'hidden',
-  alignSelf: 'start',
-  position: 'sticky',
-  top: theme.spacing(12),
   backgroundColor: theme.palette.background.paper,
   boxShadow:
     theme.palette.mode === 'dark'

@@ -33,7 +33,9 @@ export function BookCover({
   }
 
   const handleLoad = (event: SyntheticEvent<HTMLImageElement>) => {
-    if (isUnavailable(size, event.currentTarget.naturalWidth)) setFailed(true);
+    if (src.includes('books.google') && isUnavailable(size, event.currentTarget.naturalWidth)) {
+      setFailed(true);
+    }
   };
 
   return (

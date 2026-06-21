@@ -1,4 +1,5 @@
 import { gql, type TypedDocumentNode } from '@apollo/client';
+import type { UploadUrl } from '../lib/imageUpload.ts';
 
 export interface Book {
   id: string;
@@ -21,6 +22,7 @@ export interface BookSearchResult {
 
 export interface BookDetail extends Book {
   isbn: string | null;
+  hasCustomCover: boolean;
 }
 
 export const BOOKS: TypedDocumentNode<{ books: Book[] }, Record<string, never>> = gql`
@@ -48,6 +50,7 @@ export const BOOK: TypedDocumentNode<{ book: BookDetail | null }, { id: string }
       coverUrl
       publishedYear
       isbn
+      hasCustomCover
     }
   }
 `;
@@ -78,6 +81,44 @@ export const IMPORT_BOOK: TypedDocumentNode<{ importBook: Book }, { googleId: st
       description
       coverUrl
       publishedYear
+    }
+  }
+`;
+
+export const REQUEST_COVER_UPLOAD_URL: TypedDocumentNode<
+  { requestCoverUploadUrl: UploadUrl },
+  { bookId: string; contentType: string }
+> = gql`
+  mutation RequestCoverUploadUrl($bookId: ID!, $contentType: String!) {
+    requestCoverUploadUrl(bookId: $bookId, contentType: $contentType) {
+      uploadUrl
+      publicUrl
+    }
+  }
+`;
+
+export const SET_BOOK_COVER: TypedDocumentNode<
+  { setBookCover: { id: string; coverUrl: string | null; hasCustomCover: boolean } },
+  { bookId: string; coverUrl: string }
+> = gql`
+  mutation SetBookCover($bookId: ID!, $coverUrl: String!) {
+    setBookCover(bookId: $bookId, coverUrl: $coverUrl) {
+      id
+      coverUrl
+      hasCustomCover
+    }
+  }
+`;
+
+export const REMOVE_BOOK_COVER: TypedDocumentNode<
+  { removeBookCover: { id: string; coverUrl: string | null; hasCustomCover: boolean } },
+  { bookId: string }
+> = gql`
+  mutation RemoveBookCover($bookId: ID!) {
+    removeBookCover(bookId: $bookId) {
+      id
+      coverUrl
+      hasCustomCover
     }
   }
 `;
