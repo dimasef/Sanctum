@@ -1,8 +1,40 @@
 /* MUI's CssBaseline handles resets and theme-driven colors.
-   Keep global CSS minimal so the theme stays the single source of truth. */
+   This layer adds the "sanctum" atmosphere: a faint paper grain over
+   everything and warm, custom-tuned scrollbars. */
 html,
 body,
 #root {
   margin: 0;
   min-height: 100vh;
+}
+
+/* A barely-there grain so flat surfaces read like aged paper, not screens. */
+#root::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 111, 37, 0.45) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 111, 37, 0.4);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 111, 37, 0.6);
 }

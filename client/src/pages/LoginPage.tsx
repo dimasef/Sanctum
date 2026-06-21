@@ -12,6 +12,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useAuth } from '../auth/authContext.ts';
+import { Eyebrow } from '../components/Eyebrow.tsx';
+import { OrnateDivider } from '../components/OrnateDivider.tsx';
 
 type Mode = 'login' | 'register';
 
@@ -60,15 +62,31 @@ function LoginPage() {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', mt: { xs: 2, sm: 6 } }}>
-      <Card sx={{ width: '100%', maxWidth: 420 }}>
-        <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
-          <Typography variant="h4" gutterBottom>
-            {isLogin ? 'Welcome back' : 'Create account'}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            {isLogin ? 'Sign in to reach your shelves.' : 'Start building your personal library.'}
-          </Typography>
+    <Box sx={{ display: 'flex', justifyContent: 'center', mt: { xs: 1, sm: 4 } }}>
+      <Card
+        sx={{
+          width: '100%',
+          maxWidth: 440,
+          backgroundColor: 'background.paper',
+          boxShadow: (t) =>
+            t.palette.mode === 'dark'
+              ? '0 30px 60px -30px rgba(0,0,0,0.8)'
+              : '0 30px 60px -32px rgba(58,40,18,0.45)',
+        }}
+      >
+        <CardContent sx={{ p: { xs: 3.5, sm: 5 } }}>
+          <Box sx={{ textAlign: 'center', mb: 1 }}>
+            <Eyebrow>{isLogin ? 'Welcome Back' : 'Join Sanctum'}</Eyebrow>
+            <Typography variant="h4" sx={{ fontSize: '2.1rem' }}>
+              {isLogin ? 'Return to your study' : 'Found your library'}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontStyle: 'italic' }}>
+              {isLogin
+                ? 'The lamps are still lit, and your shelves wait.'
+                : 'Every great library begins with a single volume.'}
+            </Typography>
+            <OrnateDivider maxWidth={200} />
+          </Box>
 
           {error && (
             <Alert severity="error" sx={{ mb: 3 }}>
