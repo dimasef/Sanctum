@@ -77,9 +77,10 @@ cd client && npm test
 - [x] 5. DataLoader: fix N+1 on relations
 - [x] 6. React UI: Apollo Client, pages, shelves
 - [x] 7. S3: cover/avatar uploads (presigned PUT; public avatars + per-user cover overrides)
-- [ ] 8. Tests: minimal coverage of the most critical/fragile paths (~15-20%),
-      backend + frontend
-- [ ] 9. CI/CD: GitHub Actions
+- [x] 8. Tests: minimal coverage of the most critical/fragile paths (~15-20%),
+      backend + frontend (Vitest)
+- [x] 9. CI/CD: GitHub Actions (PR + push to main → lint, typecheck, test for
+      client & server)
 - [ ] 10. AWS deploy: RDS, S3+CloudFront, EC2
 - [ ] 11. AI recommendations: pick book(s) → Claude suggests 5 similar by
       vibe/theme, each resolved through Google Books (covers + import)
