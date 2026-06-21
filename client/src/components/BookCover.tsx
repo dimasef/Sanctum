@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { Box, CardMedia } from '@mui/material';
-import { upgradeCoverUrl } from '../books/coverUrl.ts';
+import { useState, type SyntheticEvent } from 'react';
+import { CardMedia } from '@mui/material';
+import { coverSrc } from '../books/coverUrl.ts';
+import { BookCoverPlaceholder } from './BookCoverPlaceholder.tsx';
 
 const coverSx = {
   width: '100%',
@@ -9,32 +10,40 @@ const coverSx = {
   display: 'block',
 } as const;
 
-const placeholderSx = {
-  ...coverSx,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  bgcolor: 'action.hover',
-  fontSize: 64,
-} as const;
+type CoverSize = 'card' | 'full';
 
-export function BookCover({ coverUrl, alt }: { coverUrl: string | null; alt: string }) {
-  const sources = [...new Set([upgradeCoverUrl(coverUrl), coverUrl])].filter(
-    (u): u is string => !!u,
-  );
-  const [step, setStep] = useState(0);
-  const src = sources[step];
+const ZOOM: Record<CoverSize, number> = { card: 2, full: 0 };
+const isUnavailable = (size: CoverSize, width: number) =>
+  size === 'full' ? width < 1000 : width > 360;
 
-  if (!src) {
-    return <Box sx={placeholderSx}>📖</Box>;
+export function BookCover({
+  coverUrl,
+  alt,
+  size = 'card',
+}: {
+  coverUrl: string | null;
+  alt: string;
+  size?: CoverSize;
+}) {
+  const src = coverSrc(coverUrl, ZOOM[size]);
+  const [failed, setFailed] = useState(false);
+
+  if (!src || failed) {
+    return <BookCoverPlaceholder title={alt} />;
   }
+
+  const handleLoad = (event: SyntheticEvent<HTMLImageElement>) => {
+    if (isUnavailable(size, event.currentTarget.naturalWidth)) setFailed(true);
+  };
 
   return (
     <CardMedia
       component="img"
       image={src}
       alt={alt}
-      onError={() => setStep((s) => s + 1)}
+      loading="lazy"
+      onLoad={handleLoad}
+      onError={() => setFailed(true)}
       sx={coverSx}
     />
   );

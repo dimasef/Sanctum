@@ -19,6 +19,10 @@ export interface BookSearchResult {
   publishedYear: number | null;
 }
 
+export interface BookDetail extends Book {
+  isbn: string | null;
+}
+
 export const BOOKS: TypedDocumentNode<{ books: Book[] }, Record<string, never>> = gql`
   query Books {
     books {
@@ -29,6 +33,21 @@ export const BOOKS: TypedDocumentNode<{ books: Book[] }, Record<string, never>> 
       description
       coverUrl
       publishedYear
+    }
+  }
+`;
+
+export const BOOK: TypedDocumentNode<{ book: BookDetail | null }, { id: string }> = gql`
+  query Book($id: ID!) {
+    book(id: $id) {
+      id
+      googleId
+      title
+      authors
+      description
+      coverUrl
+      publishedYear
+      isbn
     }
   }
 `;

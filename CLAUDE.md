@@ -75,11 +75,13 @@ cd client && npm test
 - [x] 3. Auth: register/login, JWT + refresh, resolver guards
 - [x] 4. Google Books: search and import books
 - [x] 5. DataLoader: fix N+1 on relations
-- [ ] 6. React UI: Apollo Client, pages, shelves
+- [x] 6. React UI: Apollo Client, pages, shelves
 - [ ] 7. S3: cover/avatar uploads
 - [ ] 8. Tests: backend + frontend
 - [ ] 9. CI/CD: GitHub Actions
 - [ ] 10. AWS deploy: RDS, S3+CloudFront, EC2
+- [ ] 11. AI recommendations: pick book(s) → Claude suggests 5 similar by
+      vibe/theme, each resolved through Google Books (covers + import)
 
 ## Deployment plan (AWS Free Tier)
 
