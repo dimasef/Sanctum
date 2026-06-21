@@ -76,7 +76,7 @@ cd client && npm test
 - [x] 4. Google Books: search and import books
 - [x] 5. DataLoader: fix N+1 on relations
 - [x] 6. React UI: Apollo Client, pages, shelves
-- [ ] 7. S3: cover/avatar uploads
+- [x] 7. S3: cover/avatar uploads (presigned PUT; public avatars + per-user cover overrides)
 - [ ] 8. Tests: backend + frontend
 - [ ] 9. CI/CD: GitHub Actions
 - [ ] 10. AWS deploy: RDS, S3+CloudFront, EC2
@@ -97,8 +97,9 @@ Rules to avoid charges:
 3. Use a **single region** (e.g. `eu-central-1`) for everything.
 4. Free Tier ends after 12 months → shut down or expect ~$15–25/mo.
 
-The developer has no AWS account yet. Register only at **stage 10** (deploy) so the
-12-month clock isn't wasted. The S3 bucket (stage 7) is the only thing created earlier.
+The AWS account + S3 bucket (`eu-central-1`) and a $1 Budgets alert were created at
+stage 7 for uploads. Everything else (EC2, RDS, CloudFront) is deferred to **stage
+10** (deploy) so the 12-month Free Tier clock isn't wasted on idle resources.
 
 ## Conventions
 

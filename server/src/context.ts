@@ -23,9 +23,10 @@ function extractUserId(req: Request): string | null {
 }
 
 export function createContext(req: Request): Context {
+  const userId = extractUserId(req);
   return {
     prisma,
-    userId: extractUserId(req),
-    loaders: createLoaders(prisma),
+    userId,
+    loaders: createLoaders(prisma, userId),
   };
 }

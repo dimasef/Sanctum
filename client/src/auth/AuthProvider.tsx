@@ -90,7 +90,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await clearSession({ refetch: true });
   };
 
-  const value: AuthContextValue = { status, user, login, register, logout };
+  const updateUser = useCallback((patch: Partial<AuthUser>) => {
+    setUser((current) => (current ? { ...current, ...patch } : current));
+  }, []);
+
+  const value: AuthContextValue = { status, user, login, register, logout, updateUser };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage.tsx';
 import BookDetailsPage from './pages/BookDetailsPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import ShelfPage from './pages/ShelfPage.tsx';
+import ProfilePage from './pages/ProfilePage.tsx';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="shelf" element={<ShelfPage />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
         </Route>
       </Routes>

@@ -4,6 +4,7 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string;
+  avatarUrl: string | null;
 }
 
 // `loading` matters: on a page reload we have a token in storage but don't yet
@@ -23,6 +24,7 @@ export interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (input: RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (patch: Partial<AuthUser>) => void;
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(undefined);

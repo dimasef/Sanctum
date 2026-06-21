@@ -20,4 +20,11 @@ export const config = {
     accessTtl: process.env.JWT_ACCESS_TTL ?? '15m',
     refreshTtl: process.env.JWT_REFRESH_TTL ?? '7d',
   },
+  s3: {
+    region: required('AWS_REGION'),
+    bucket: required('AWS_S3_BUCKET'),
+    accessKeyId: required('AWS_ACCESS_KEY_ID'),
+    secretAccessKey: required('AWS_SECRET_ACCESS_KEY'),
+    publicBaseUrl: required('AWS_S3_PUBLIC_BASE_URL'),
+  },
 };

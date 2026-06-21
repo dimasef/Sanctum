@@ -12,6 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import { BookCover } from '../components/BookCover.tsx';
+import { CoverUploadControl } from '../components/CoverUploadControl.tsx';
 import { BOOK } from '../books/operations.ts';
 import { stripHtml } from '../books/stripHtml.ts';
 import {
@@ -87,9 +88,14 @@ function BookDetailsPage() {
       </Button>
 
       <Layout>
-        <CoverPane>
-          <BookCover coverUrl={book.coverUrl} alt={book.title} size="full" />
-        </CoverPane>
+        <Box sx={{ alignSelf: 'start', position: { sm: 'sticky' }, top: (t) => t.spacing(12) }}>
+          <CoverPane>
+            <BookCover key={book.coverUrl} coverUrl={book.coverUrl} alt={book.title} size="full" />
+          </CoverPane>
+          {status === 'authenticated' && (
+            <CoverUploadControl bookId={book.id} hasCustomCover={book.hasCustomCover} />
+          )}
+        </Box>
 
         <InfoPanel>
           <Eyebrow>From the Collection</Eyebrow>
