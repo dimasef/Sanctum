@@ -54,7 +54,7 @@ function mapVolume(volume: GoogleVolume): BookData {
 
 async function fetchGoogle<T>(path: string): Promise<T> {
   const sep = path.includes('?') ? '&' : '?';
-  const url = `${API_BASE}${path}${sep}key=${config.googleBooksApiKey}`;
+  const url = `${API_BASE}${path}${sep}key=${config.googleBooksApiKey}&country=US`;
 
   let res: Response;
   try {
