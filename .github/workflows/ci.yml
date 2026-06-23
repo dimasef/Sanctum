@@ -107,11 +107,13 @@ jobs:
       - name: Deploy on EC2 via SSM
         run: |
           REMOTE='cd ~/Sanctum && git pull --ff-only && cd server && npm ci && npx prisma migrate deploy && npx prisma generate && npm run build && pm2 restart sanctum-api --update-env'
+          WRAPPED="sudo -iu ubuntu bash -lc \"${REMOTE}\""
+          PARAMS=$(jq -n --arg c "$WRAPPED" '{commands: [$c]}')
           CMD_ID=$(aws ssm send-command \
             --instance-ids "${EC2_INSTANCE_ID}" \
             --document-name AWS-RunShellScript \
             --comment "Deploy backend from GitHub Actions" \
-            --parameters commands="sudo -iu ubuntu bash -lc '${REMOTE}'" \
+            --parameters "$PARAMS" \
             --query Command.CommandId --output text)
           echo "SSM command: ${CMD_ID}"
 
