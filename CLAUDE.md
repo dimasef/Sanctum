@@ -81,7 +81,9 @@ cd client && npm test
       backend + frontend (Vitest)
 - [x] 9. CI/CD: GitHub Actions (PR + push to main → lint, typecheck, test for
       client & server)
-- [ ] 10. AWS deploy: RDS, S3+CloudFront, EC2
+- [x] 10. AWS deploy: RDS + EC2 (pm2) + S3/CloudFront, single-CloudFront origin
+      (S3 static + EC2 `/graphql`, same-origin so no CORS); live at
+      https://d2s5dtpldogequ.cloudfront.net
 - [ ] 11. AI recommendations: pick book(s) → Claude suggests 5 similar by
       vibe/theme, each resolved through Google Books (covers + import)
 - [ ] 12. Testing depth: broaden into varied test types (integration, E2E,
