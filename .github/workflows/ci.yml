@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  AWS_REGION: eu-central-1
+  DEPLOY_ROLE_ARN: arn:aws:iam::777997078545:role/github-actions-deploy
+  WEB_BUCKET: sanctum-web-static
+  CLOUDFRONT_DISTRIBUTION_ID: EBIFGUCKBGFW
+  EC2_INSTANCE_ID: i-00e6c405006a49045
+
 jobs:
   verify:
     name: ${{ matrix.package }}
@@ -43,3 +50,89 @@ jobs:
       - name: Test
         working-directory: ${{ matrix.package }}
         run: npm test
+
+  deploy-frontend:
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Build
+        working-directory: client
+        run: npm run build
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync to S3
+        run: aws s3 sync client/dist "s3://${WEB_BUCKET}" --delete
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${CLOUDFRONT_DISTRIBUTION_ID}" \
+            --paths "/*"
+
+  deploy-backend:
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy on EC2 via SSM
+        run: |
+          REMOTE='cd ~/Sanctum && git pull --ff-only && cd server && npm ci && npx prisma migrate deploy && npx prisma generate && npm run build && pm2 restart sanctum-api --update-env'
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids "${EC2_INSTANCE_ID}" \
+            --document-name AWS-RunShellScript \
+            --comment "Deploy backend from GitHub Actions" \
+            --parameters commands="sudo -iu ubuntu bash -lc '${REMOTE}'" \
+            --query Command.CommandId --output text)
+          echo "SSM command: ${CMD_ID}"
+
+          for _ in $(seq 1 60); do
+            STATUS=$(aws ssm get-command-invocation \
+              --command-id "${CMD_ID}" --instance-id "${EC2_INSTANCE_ID}" \
+              --query Status --output text 2>/dev/null || echo Pending)
+            echo "status: ${STATUS}"
+            case "${STATUS}" in
+              Success|Failed|Cancelled|TimedOut) break ;;
+            esac
+            sleep 10
+          done
+
+          echo "----- command output -----"
+          aws ssm get-command-invocation \
+            --command-id "${CMD_ID}" --instance-id "${EC2_INSTANCE_ID}" \
+            --query 'StandardOutputContent' --output text
+          echo "----- command errors -----"
+          aws ssm get-command-invocation \
+            --command-id "${CMD_ID}" --instance-id "${EC2_INSTANCE_ID}" \
+            --query 'StandardErrorContent' --output text
+
+          test "${STATUS}" = "Success"
