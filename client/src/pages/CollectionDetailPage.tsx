@@ -18,11 +18,13 @@ import {
   MY_COLLECTIONS,
   REMOVE_BOOK_FROM_COLLECTION,
 } from '../collections/operations.ts';
+import { MY_SHELF, STATUS_LABELS, STATUS_ORDER, type ShelfStatus } from '../shelf/operations.ts';
 
 function CollectionDetailPage() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const { data, loading, error } = useQuery(COLLECTION, { variables: { id } });
+  const shelf = useQuery(MY_SHELF);
   const [editOpen, setEditOpen] = useState(false);
 
   const [removeBook] = useMutation(REMOVE_BOOK_FROM_COLLECTION, {
@@ -40,20 +42,60 @@ function CollectionDetailPage() {
 
   const books = collection.books ?? [];
 
+  const statusByBookId = new Map<string, ShelfStatus>(
+    (shelf.data?.me?.shelf ?? []).map((item) => [item.book.id, item.status]),
+  );
+  const groups: { key: string; label: string; books: typeof books }[] = [
+    ...STATUS_ORDER.map((statusKey) => ({
+      key: statusKey,
+      label: STATUS_LABELS[statusKey],
+      books: books.filter((book) => statusByBookId.get(book.id) === statusKey),
+    })),
+    {
+      key: 'UNSHELVED',
+      label: 'Not on a reading shelf',
+      books: books.filter((book) => !statusByBookId.has(book.id)),
+    },
+  ];
+
   const handleDelete = async () => {
-    if (!window.confirm(`Delete the collection “${collection.name}”? This can't be undone.`)) return;
+    if (!window.confirm(`Delete the shelf “${collection.name}”? This can't be undone.`)) return;
     await deleteCollection({ variables: { id } });
     navigate('/collections');
   };
 
+  const renderBook = (book: (typeof books)[number]) => (
+    <BookFlipCard
+      key={book.id}
+      to={`/book/${book.id}`}
+      coverUrl={book.coverUrl}
+      title={book.title}
+      authors={book.authors}
+      publishedYear={book.publishedYear}
+      description={book.description}
+      action={
+        <Button
+          size="small"
+          color="inherit"
+          onClick={(e) => {
+            e.preventDefault();
+            void removeBook({ variables: { collectionId: id, bookId: book.id } });
+          }}
+        >
+          Remove
+        </Button>
+      }
+    />
+  );
+
   return (
     <Box>
       <Button component={RouterLink} to="/collections" sx={{ mb: 3, ml: -1 }}>
-        ← Collections
+        ← My Shelves
       </Button>
 
       <Box sx={{ textAlign: 'center', mb: 1 }}>
-        <Eyebrow>A Collection</Eyebrow>
+        <Eyebrow>A Shelf</Eyebrow>
         <Box
           sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.5, justifyContent: 'center' }}
         >
@@ -103,34 +145,14 @@ function CollectionDetailPage() {
           </Button>
         </Paper>
       ) : (
-        <>
-          <SectionHeading count={books.length}>Volumes</SectionHeading>
-          <BookGrid>
-            {books.map((book) => (
-              <BookFlipCard
-                key={book.id}
-                to={`/book/${book.id}`}
-                coverUrl={book.coverUrl}
-                title={book.title}
-                authors={book.authors}
-                publishedYear={book.publishedYear}
-                description={book.description}
-                action={
-                  <Button
-                    size="small"
-                    color="inherit"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      void removeBook({ variables: { collectionId: id, bookId: book.id } });
-                    }}
-                  >
-                    Remove
-                  </Button>
-                }
-              />
-            ))}
-          </BookGrid>
-        </>
+        groups.map((group) =>
+          group.books.length === 0 ? null : (
+            <Box key={group.key} sx={{ mb: 5 }}>
+              <SectionHeading count={group.books.length}>{group.label}</SectionHeading>
+              <BookGrid>{group.books.map(renderBook)}</BookGrid>
+            </Box>
+          ),
+        )
       )}
 
       <CollectionFormDialog

@@ -22,10 +22,13 @@ function ShelfPage() {
 
   return (
     <Box>
+      <Button component={RouterLink} to="/collections" sx={{ mb: 3, ml: -1 }}>
+        ← My Shelves
+      </Button>
       <Box sx={{ textAlign: 'center', mb: 1 }}>
         <Eyebrow>Your Reading Life</Eyebrow>
         <Typography variant="h2" sx={{ fontSize: { xs: '2.5rem', sm: '3.5rem' } }}>
-          My Shelf
+          All Books
         </Typography>
         <Typography
           variant="subtitle1"
