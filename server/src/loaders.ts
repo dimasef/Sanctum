@@ -38,20 +38,20 @@ export function createLoaders(prisma: PrismaClient, userId: string | null) {
       (ids) => prisma.review.findMany({ where: { userId: { in: ids } } }),
       (r) => r.userId,
     ),
-    shelvesByUserId: oneToMany(
-      (ids) => prisma.shelf.findMany({ where: { userId: { in: ids } } }),
+    readingStatusesByUserId: oneToMany(
+      (ids) => prisma.readingStatus.findMany({ where: { userId: { in: ids } } }),
       (s) => s.userId,
     ),
     userById: toOne((ids) => prisma.user.findMany({ where: { id: { in: ids } } })),
     bookById: toOne((ids) => prisma.book.findMany({ where: { id: { in: ids } } })),
-    collectionsByUserId: oneToMany(
-      (ids) => prisma.collection.findMany({ where: { userId: { in: ids } } }),
-      (c) => c.userId,
+    shelvesByUserId: oneToMany(
+      (ids) => prisma.shelf.findMany({ where: { userId: { in: ids } } }),
+      (s) => s.userId,
     ),
-    collectionById: toOne((ids) => prisma.collection.findMany({ where: { id: { in: ids } } })),
-    itemsByCollectionId: oneToMany(
-      (ids) => prisma.collectionItem.findMany({ where: { collectionId: { in: ids } } }),
-      (it) => it.collectionId,
+    shelfById: toOne((ids) => prisma.shelf.findMany({ where: { id: { in: ids } } })),
+    booksByShelfId: oneToMany(
+      (ids) => prisma.shelfBook.findMany({ where: { shelfId: { in: ids } } }),
+      (it) => it.shelfId,
     ),
     coverOverrideByBookId: new DataLoader<string, string | null>(async (bookIds) => {
       if (!userId) return bookIds.map(() => null);

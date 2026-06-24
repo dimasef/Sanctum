@@ -12,10 +12,12 @@ datasource db {
   provider = "postgresql"
 }
 
-enum ShelfStatus {
+enum ReadingState {
   WANT_TO_READ
   READING
   READ
+
+  @@map("ShelfStatus")
 }
 
 model User {
@@ -27,11 +29,11 @@ model User {
   avatarUrl    String?
   createdAt    DateTime @default(now())
 
-  shelves       Shelf[]
-  reviews       Review[]
-  refreshTokens RefreshToken[]
-  bookCovers    BookCover[]
-  collections   Collection[]
+  readingStatuses ReadingStatus[]
+  reviews         Review[]
+  refreshTokens   RefreshToken[]
+  bookCovers      BookCover[]
+  shelves         Shelf[]
 }
 
 model Book {
@@ -44,16 +46,16 @@ model Book {
   publishedYear Int?
   isbn          String?
 
-  shelves         Shelf[]
+  readingStatuses ReadingStatus[]
   reviews         Review[]
   bookCovers      BookCover[]
-  collectionItems CollectionItem[]
+  shelfBooks      ShelfBook[]
 }
 
-model Shelf {
-  id      String      @id @default(uuid())
-  status  ShelfStatus
-  addedAt DateTime    @default(now())
+model ReadingStatus {
+  id      String       @id @default(uuid())
+  status  ReadingState
+  addedAt DateTime     @default(now())
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -61,6 +63,7 @@ model Shelf {
   book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   @@unique([userId, bookId])
+  @@map("Shelf")
 }
 
 model Review {
@@ -92,7 +95,7 @@ model BookCover {
   @@unique([userId, bookId])
 }
 
-model Collection {
+model Shelf {
   id        String   @id @default(uuid())
   name      String
   color     String
@@ -102,21 +105,23 @@ model Collection {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  items CollectionItem[]
+  items ShelfBook[]
 
   @@unique([userId, name])
+  @@map("Bookshelf")
 }
 
-model CollectionItem {
+model ShelfBook {
   id      String   @id @default(uuid())
   addedAt DateTime @default(now())
 
-  collectionId String
-  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  bookId       String
-  book         Book       @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  shelfId String
+  shelf   Shelf  @relation(fields: [shelfId], references: [id], onDelete: Cascade)
+  bookId  String
+  book    Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
-  @@unique([collectionId, bookId])
+  @@unique([shelfId, bookId])
+  @@map("BookshelfItem")
 }
 
 model RefreshToken {

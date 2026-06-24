@@ -7,22 +7,22 @@ import { CenteredSpinner } from '../components/CenteredSpinner.tsx';
 import { Eyebrow } from '../components/Eyebrow.tsx';
 import { OrnateDivider } from '../components/OrnateDivider.tsx';
 import { SectionHeading } from '../components/SectionHeading.tsx';
-import { ShelfStats } from '../components/ShelfStats.tsx';
-import { MY_SHELF, STATUS_LABELS, STATUS_ORDER } from '../shelf/operations.ts';
-import { Ledge, Shelf } from './ShelfPage.styles.ts';
+import { ReadingStats } from '../components/ReadingStats.tsx';
+import { MY_READING, STATUS_LABELS, STATUS_ORDER } from '../reading-status/operations.ts';
+import { Ledge, Shelf } from './AllBooksPage.styles.ts';
 
-function ShelfPage() {
-  const { data, loading, error } = useQuery(MY_SHELF);
+function AllBooksPage() {
+  const { data, loading, error } = useQuery(MY_READING);
 
   if (loading) return <CenteredSpinner mt={10} />;
 
   if (error) return <Alert severity="error">{error.message}</Alert>;
 
-  const items = data?.me?.shelf ?? [];
+  const items = data?.me?.readingStatuses ?? [];
 
   return (
     <Box>
-      <Button component={RouterLink} to="/collections" sx={{ mb: 3, ml: -1 }}>
+      <Button component={RouterLink} to="/shelves" sx={{ mb: 3, ml: -1 }}>
         ← My Shelves
       </Button>
       <Box sx={{ textAlign: 'center', mb: 1 }}>
@@ -64,7 +64,7 @@ function ShelfPage() {
         </Paper>
       ) : (
         <>
-          <ShelfStats
+          <ReadingStats
             reading={items.filter((item) => item.status === 'READING').length}
             wantToRead={items.filter((item) => item.status === 'WANT_TO_READ').length}
             read={items.filter((item) => item.status === 'READ').length}
@@ -99,4 +99,4 @@ function ShelfPage() {
   );
 }
 
-export default ShelfPage;
+export default AllBooksPage;

@@ -1,5 +1,5 @@
 export const typeDefs = `#graphql
-  enum ShelfStatus {
+  enum ReadingState {
     WANT_TO_READ
     READING
     READ
@@ -12,12 +12,12 @@ export const typeDefs = `#graphql
     bio: String
     avatarUrl: String
     createdAt: String!
-    shelf: [ShelfItem!]!
+    readingStatuses: [ReadingStatus!]!
     reviews: [Review!]!
-    collections: [Collection!]!
+    shelves: [Shelf!]!
   }
 
-  type Collection {
+  type Shelf {
     id: ID!
     name: String!
     color: String!
@@ -27,13 +27,13 @@ export const typeDefs = `#graphql
     bookCount: Int!
   }
 
-  input CreateCollectionInput {
+  input CreateShelfInput {
     name: String!
     color: String!
     icon: String!
   }
 
-  input UpdateCollectionInput {
+  input UpdateShelfInput {
     name: String
     color: String
     icon: String
@@ -52,9 +52,9 @@ export const typeDefs = `#graphql
     hasCustomCover: Boolean!
   }
 
-  type ShelfItem {
+  type ReadingStatus {
     id: ID!
-    status: ShelfStatus!
+    status: ReadingState!
     addedAt: String!
     user: User!
     book: Book!
@@ -115,7 +115,7 @@ export const typeDefs = `#graphql
     users: [User!]!
     user(id: ID!): User
     searchBooks(query: String!): [BookSearchResult!]!
-    collection(id: ID!): Collection
+    shelf(id: ID!): Shelf
   }
 
   type Mutation {
@@ -124,9 +124,8 @@ export const typeDefs = `#graphql
     refreshToken(token: String!): AuthPayload!
     logout(token: String!): Boolean!
     importBook(googleId: String!): Book!
-    addToShelf(bookId: ID!, status: ShelfStatus!): ShelfItem!
-    moveOnShelf(bookId: ID!, status: ShelfStatus!): ShelfItem!
-    removeFromShelf(bookId: ID!): Boolean!
+    setReadingStatus(bookId: ID!, status: ReadingState!): ReadingStatus!
+    removeReadingStatus(bookId: ID!): Boolean!
     upsertReview(bookId: ID!, rating: Int!, body: String): Review!
     deleteReview(bookId: ID!): Boolean!
     updateProfile(input: UpdateProfileInput!): User!
@@ -134,10 +133,10 @@ export const typeDefs = `#graphql
     requestCoverUploadUrl(bookId: ID!, contentType: String!): UploadUrl!
     setBookCover(bookId: ID!, coverUrl: String!): Book!
     removeBookCover(bookId: ID!): Book!
-    createCollection(input: CreateCollectionInput!): Collection!
-    updateCollection(id: ID!, input: UpdateCollectionInput!): Collection!
-    deleteCollection(id: ID!): Boolean!
-    addBookToCollection(collectionId: ID!, bookId: ID!): Collection!
-    removeBookFromCollection(collectionId: ID!, bookId: ID!): Collection!
+    createShelf(input: CreateShelfInput!): Shelf!
+    updateShelf(id: ID!, input: UpdateShelfInput!): Shelf!
+    deleteShelf(id: ID!): Boolean!
+    addBookToShelf(shelfId: ID!, bookId: ID!): Shelf!
+    removeBookFromShelf(shelfId: ID!, bookId: ID!): Shelf!
   }
 `;

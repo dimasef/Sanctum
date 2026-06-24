@@ -1,14 +1,14 @@
 import { Fragment } from 'react';
 import { Typography } from '@mui/material';
-import { Divider, Stat, StatNumber, Strip } from './ShelfStats.styles.ts';
+import { Divider, Stat, StatNumber, Strip } from './ReadingStats.styles.ts';
 
-interface ShelfStatsProps {
+interface ReadingStatsProps {
   reading: number;
   wantToRead: number;
   read: number;
 }
 
-export function ShelfStats({ reading, wantToRead, read }: ShelfStatsProps) {
+export function ReadingStats({ reading, wantToRead, read }: ReadingStatsProps) {
   const cells = [
     { label: 'Reading', value: reading },
     { label: 'Want to read', value: wantToRead },

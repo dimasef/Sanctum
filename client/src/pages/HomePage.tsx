@@ -18,7 +18,7 @@ import { Eyebrow } from '../components/Eyebrow.tsx';
 import { OrnateDivider } from '../components/OrnateDivider.tsx';
 import { SectionHeading } from '../components/SectionHeading.tsx';
 import { BOOKS, IMPORT_BOOK, SEARCH_BOOKS } from '../books/operations.ts';
-import { MY_SHELF, type ShelfItem } from '../shelf/operations.ts';
+import { MY_READING, type ReadingStatus } from '../reading-status/operations.ts';
 import { useAuth } from '../auth/authContext.ts';
 
 const MIN_QUERY_LENGTH = 2;
@@ -44,7 +44,7 @@ function HomePage() {
   const searching = query.length >= MIN_QUERY_LENGTH;
 
   const catalog = useQuery(BOOKS);
-  const shelf = useQuery(MY_SHELF, { skip: !isAuthenticated });
+  const reading = useQuery(MY_READING, { skip: !isAuthenticated });
   const search = useQuery(SEARCH_BOOKS, { variables: { query }, skip: !searching });
 
   const [importBook] = useMutation(IMPORT_BOOK, {
@@ -124,11 +124,13 @@ function HomePage() {
   };
 
   const renderHome = () => {
-    if (catalog.loading || (isAuthenticated && shelf.loading)) return <CenteredSpinner />;
+    if (catalog.loading || (isAuthenticated && reading.loading)) return <CenteredSpinner />;
     if (catalog.error) return <Alert severity="error">{catalog.error.message}</Alert>;
 
     const books = catalog.data?.books ?? [];
-    const shelfItems: ShelfItem[] = isAuthenticated ? (shelf.data?.me?.shelf ?? []) : [];
+    const shelfItems: ReadingStatus[] = isAuthenticated
+      ? (reading.data?.me?.readingStatuses ?? [])
+      : [];
     const shelfBookIds = new Set(shelfItems.map((item) => item.book.id));
 
     const personalSections = [

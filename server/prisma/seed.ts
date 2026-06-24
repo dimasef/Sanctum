@@ -1,4 +1,4 @@
-import { ShelfStatus } from '../src/generated/prisma/client.js';
+import { ReadingState } from '../src/generated/prisma/client.js';
 import { prisma } from '../src/prisma.js';
 
 async function main(): Promise<void> {
@@ -36,16 +36,16 @@ async function main(): Promise<void> {
     },
   });
 
-  await prisma.shelf.upsert({
+  await prisma.readingStatus.upsert({
     where: { userId_bookId: { userId: user.id, bookId: cleanCode.id } },
-    update: { status: ShelfStatus.READ },
-    create: { userId: user.id, bookId: cleanCode.id, status: ShelfStatus.READ },
+    update: { status: ReadingState.READ },
+    create: { userId: user.id, bookId: cleanCode.id, status: ReadingState.READ },
   });
 
-  await prisma.shelf.upsert({
+  await prisma.readingStatus.upsert({
     where: { userId_bookId: { userId: user.id, bookId: pragmatic.id } },
-    update: { status: ShelfStatus.READING },
-    create: { userId: user.id, bookId: pragmatic.id, status: ShelfStatus.READING },
+    update: { status: ReadingState.READING },
+    create: { userId: user.id, bookId: pragmatic.id, status: ReadingState.READING },
   });
 
   await prisma.review.upsert({

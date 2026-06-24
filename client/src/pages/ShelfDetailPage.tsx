@@ -7,43 +7,48 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { BookFlipCard } from '../components/BookFlipCard.tsx';
 import { BookGrid } from '../components/BookGrid.tsx';
 import { CenteredSpinner } from '../components/CenteredSpinner.tsx';
-import { CollectionFormDialog } from '../components/CollectionFormDialog.tsx';
-import { CollectionIcon } from '../components/CollectionIcon.tsx';
+import { ShelfFormDialog } from '../components/ShelfFormDialog.tsx';
+import { ShelfIcon } from '../components/ShelfIcon.tsx';
 import { Eyebrow } from '../components/Eyebrow.tsx';
 import { OrnateDivider } from '../components/OrnateDivider.tsx';
 import { SectionHeading } from '../components/SectionHeading.tsx';
 import {
-  COLLECTION,
-  DELETE_COLLECTION,
-  MY_COLLECTIONS,
-  REMOVE_BOOK_FROM_COLLECTION,
-} from '../collections/operations.ts';
-import { MY_SHELF, STATUS_LABELS, STATUS_ORDER, type ShelfStatus } from '../shelf/operations.ts';
+  SHELF,
+  DELETE_SHELF,
+  MY_SHELVES,
+  REMOVE_BOOK_FROM_SHELF,
+} from '../shelf/operations.ts';
+import {
+  MY_READING,
+  STATUS_LABELS,
+  STATUS_ORDER,
+  type ReadingState,
+} from '../reading-status/operations.ts';
 
-function CollectionDetailPage() {
+function ShelfDetailPage() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
-  const { data, loading, error } = useQuery(COLLECTION, { variables: { id } });
-  const shelf = useQuery(MY_SHELF);
+  const { data, loading, error } = useQuery(SHELF, { variables: { id } });
+  const reading = useQuery(MY_READING);
   const [editOpen, setEditOpen] = useState(false);
 
-  const [removeBook] = useMutation(REMOVE_BOOK_FROM_COLLECTION, {
-    refetchQueries: [{ query: COLLECTION, variables: { id } }],
+  const [removeBook] = useMutation(REMOVE_BOOK_FROM_SHELF, {
+    refetchQueries: [{ query: SHELF, variables: { id } }],
   });
-  const [deleteCollection, deleteState] = useMutation(DELETE_COLLECTION, {
-    refetchQueries: [{ query: MY_COLLECTIONS }],
+  const [deleteShelf, deleteState] = useMutation(DELETE_SHELF, {
+    refetchQueries: [{ query: MY_SHELVES }],
   });
 
   if (loading) return <CenteredSpinner mt={10} />;
   if (error) return <Alert severity="error">{error.message}</Alert>;
 
-  const collection = data?.collection;
-  if (!collection) return <Alert severity="warning">Collection not found.</Alert>;
+  const shelf = data?.shelf;
+  if (!shelf) return <Alert severity="warning">Shelf not found.</Alert>;
 
-  const books = collection.books ?? [];
+  const books = shelf.books ?? [];
 
-  const statusByBookId = new Map<string, ShelfStatus>(
-    (shelf.data?.me?.shelf ?? []).map((item) => [item.book.id, item.status]),
+  const statusByBookId = new Map<string, ReadingState>(
+    (reading.data?.me?.readingStatuses ?? []).map((item) => [item.book.id, item.status]),
   );
   const groups: { key: string; label: string; books: typeof books }[] = [
     ...STATUS_ORDER.map((statusKey) => ({
@@ -59,9 +64,9 @@ function CollectionDetailPage() {
   ];
 
   const handleDelete = async () => {
-    if (!window.confirm(`Delete the shelf “${collection.name}”? This can't be undone.`)) return;
-    await deleteCollection({ variables: { id } });
-    navigate('/collections');
+    if (!window.confirm(`Delete the shelf “${shelf.name}”? This can't be undone.`)) return;
+    await deleteShelf({ variables: { id } });
+    navigate('/shelves');
   };
 
   const renderBook = (book: (typeof books)[number]) => (
@@ -79,7 +84,7 @@ function CollectionDetailPage() {
           color="inherit"
           onClick={(e) => {
             e.preventDefault();
-            void removeBook({ variables: { collectionId: id, bookId: book.id } });
+            void removeBook({ variables: { shelfId: id, bookId: book.id } });
           }}
         >
           Remove
@@ -90,7 +95,7 @@ function CollectionDetailPage() {
 
   return (
     <Box>
-      <Button component={RouterLink} to="/collections" sx={{ mb: 3, ml: -1 }}>
+      <Button component={RouterLink} to="/shelves" sx={{ mb: 3, ml: -1 }}>
         ← My Shelves
       </Button>
 
@@ -99,9 +104,9 @@ function CollectionDetailPage() {
         <Box
           sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.5, justifyContent: 'center' }}
         >
-          <CollectionIcon icon={collection.icon} sx={{ color: collection.color, fontSize: 40 }} />
+          <ShelfIcon icon={shelf.icon} sx={{ color: shelf.color, fontSize: 40 }} />
           <Typography variant="h2" sx={{ fontSize: { xs: '2.2rem', sm: '3rem' } }}>
-            {collection.name}
+            {shelf.name}
           </Typography>
         </Box>
         <Stack direction="row" spacing={1} sx={{ justifyContent: 'center', mt: 2 }}>
@@ -138,7 +143,7 @@ function CollectionDetailPage() {
             No books yet
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Open a book and add it to this collection from its page.
+            Open a book and add it to this shelf from its page.
           </Typography>
           <Button variant="contained" component={RouterLink} to="/">
             Discover books
@@ -155,13 +160,9 @@ function CollectionDetailPage() {
         )
       )}
 
-      <CollectionFormDialog
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        collection={collection}
-      />
+      <ShelfFormDialog open={editOpen} onClose={() => setEditOpen(false)} shelf={shelf} />
     </Box>
   );
 }
 
-export default CollectionDetailPage;
+export default ShelfDetailPage;

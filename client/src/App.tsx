@@ -4,10 +4,10 @@ import ProtectedRoute from './components/ProtectedRoute.tsx';
 import HomePage from './pages/HomePage.tsx';
 import BookDetailsPage from './pages/BookDetailsPage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
-import ShelfPage from './pages/ShelfPage.tsx';
+import AllBooksPage from './pages/AllBooksPage.tsx';
 import ProfilePage from './pages/ProfilePage.tsx';
-import CollectionsPage from './pages/CollectionsPage.tsx';
-import CollectionDetailPage from './pages/CollectionDetailPage.tsx';
+import ShelvesPage from './pages/ShelvesPage.tsx';
+import ShelfDetailPage from './pages/ShelfDetailPage.tsx';
 
 function App() {
   return (
@@ -18,10 +18,10 @@ function App() {
           <Route path="book/:id" element={<BookDetailsPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
-            <Route path="shelf" element={<ShelfPage />} />
+            <Route path="reading" element={<AllBooksPage />} />
             <Route path="profile" element={<ProfilePage />} />
-            <Route path="collections" element={<CollectionsPage />} />
-            <Route path="collections/:id" element={<CollectionDetailPage />} />
+            <Route path="shelves" element={<ShelvesPage />} />
+            <Route path="shelves/:id" element={<ShelfDetailPage />} />
           </Route>
         </Route>
       </Routes>

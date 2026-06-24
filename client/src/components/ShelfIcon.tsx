@@ -8,9 +8,9 @@ import ScienceIcon from '@mui/icons-material/ScienceOutlined';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import BookmarkIcon from '@mui/icons-material/BookmarkBorderOutlined';
 import type { ComponentType } from 'react';
-import type { CollectionIconKey } from '../collections/operations.ts';
+import type { ShelfIconKey } from '../shelf/operations.ts';
 
-const ICONS: Record<CollectionIconKey, ComponentType<SvgIconProps>> = {
+const ICONS: Record<ShelfIconKey, ComponentType<SvgIconProps>> = {
   favorite: FavoriteIcon,
   history: HistoryIcon,
   star: StarIcon,
@@ -21,7 +21,7 @@ const ICONS: Record<CollectionIconKey, ComponentType<SvgIconProps>> = {
   bookmark: BookmarkIcon,
 };
 
-export function CollectionIcon({ icon, ...props }: { icon: string } & SvgIconProps) {
-  const Icon = ICONS[icon as CollectionIconKey] ?? BookIcon;
+export function ShelfIcon({ icon, ...props }: { icon: string } & SvgIconProps) {
+  const Icon = ICONS[icon as ShelfIconKey] ?? BookIcon;
   return <Icon {...props} />;
 }
