@@ -14,6 +14,29 @@ export const typeDefs = `#graphql
     createdAt: String!
     shelf: [ShelfItem!]!
     reviews: [Review!]!
+    collections: [Collection!]!
+  }
+
+  type Collection {
+    id: ID!
+    name: String!
+    color: String!
+    icon: String!
+    createdAt: String!
+    books: [Book!]!
+    bookCount: Int!
+  }
+
+  input CreateCollectionInput {
+    name: String!
+    color: String!
+    icon: String!
+  }
+
+  input UpdateCollectionInput {
+    name: String
+    color: String
+    icon: String
   }
 
   type Book {
@@ -92,6 +115,7 @@ export const typeDefs = `#graphql
     users: [User!]!
     user(id: ID!): User
     searchBooks(query: String!): [BookSearchResult!]!
+    collection(id: ID!): Collection
   }
 
   type Mutation {
@@ -110,5 +134,10 @@ export const typeDefs = `#graphql
     requestCoverUploadUrl(bookId: ID!, contentType: String!): UploadUrl!
     setBookCover(bookId: ID!, coverUrl: String!): Book!
     removeBookCover(bookId: ID!): Book!
+    createCollection(input: CreateCollectionInput!): Collection!
+    updateCollection(id: ID!, input: UpdateCollectionInput!): Collection!
+    deleteCollection(id: ID!): Boolean!
+    addBookToCollection(collectionId: ID!, bookId: ID!): Collection!
+    removeBookFromCollection(collectionId: ID!, bookId: ID!): Collection!
   }
 `;

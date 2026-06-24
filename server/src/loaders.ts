@@ -44,6 +44,15 @@ export function createLoaders(prisma: PrismaClient, userId: string | null) {
     ),
     userById: toOne((ids) => prisma.user.findMany({ where: { id: { in: ids } } })),
     bookById: toOne((ids) => prisma.book.findMany({ where: { id: { in: ids } } })),
+    collectionsByUserId: oneToMany(
+      (ids) => prisma.collection.findMany({ where: { userId: { in: ids } } }),
+      (c) => c.userId,
+    ),
+    collectionById: toOne((ids) => prisma.collection.findMany({ where: { id: { in: ids } } })),
+    itemsByCollectionId: oneToMany(
+      (ids) => prisma.collectionItem.findMany({ where: { collectionId: { in: ids } } }),
+      (it) => it.collectionId,
+    ),
     coverOverrideByBookId: new DataLoader<string, string | null>(async (bookIds) => {
       if (!userId) return bookIds.map(() => null);
       const rows = await prisma.bookCover.findMany({

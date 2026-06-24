@@ -31,6 +31,7 @@ model User {
   reviews       Review[]
   refreshTokens RefreshToken[]
   bookCovers    BookCover[]
+  collections   Collection[]
 }
 
 model Book {
@@ -43,9 +44,10 @@ model Book {
   publishedYear Int?
   isbn          String?
 
-  shelves    Shelf[]
-  reviews    Review[]
-  bookCovers BookCover[]
+  shelves         Shelf[]
+  reviews         Review[]
+  bookCovers      BookCover[]
+  collectionItems CollectionItem[]
 }
 
 model Shelf {
@@ -88,6 +90,33 @@ model BookCover {
   book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   @@unique([userId, bookId])
+}
+
+model Collection {
+  id        String   @id @default(uuid())
+  name      String
+  color     String
+  icon      String
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  items CollectionItem[]
+
+  @@unique([userId, name])
+}
+
+model CollectionItem {
+  id      String   @id @default(uuid())
+  addedAt DateTime @default(now())
+
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  bookId       String
+  book         Book       @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, bookId])
 }
 
 model RefreshToken {

@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { BookCover } from '../components/BookCover.tsx';
 import { CoverUploadControl } from '../components/CoverUploadControl.tsx';
+import { AddToCollectionControl } from '../components/AddToCollectionControl.tsx';
 import { BOOK } from '../books/operations.ts';
 import { stripHtml } from '../books/stripHtml.ts';
 import {
@@ -133,6 +134,12 @@ function BookDetailsPage() {
               <Button color="inherit" disabled={busy} onClick={handleRemove} sx={{ ml: 1 }}>
                 Remove
               </Button>
+            )}
+
+            {status === 'authenticated' && (
+              <Box sx={{ mt: 1.5 }}>
+                <AddToCollectionControl bookId={book.id} />
+              </Box>
             )}
 
             {status !== 'authenticated' && (
