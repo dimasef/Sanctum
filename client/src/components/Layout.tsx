@@ -1,3 +1,4 @@
+import { useState, type MouseEvent } from 'react';
 import { AppBar, Avatar, Box, Container, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
 import { Link as RouterLink, Outlet, useNavigate } from 'react-router-dom';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
@@ -5,7 +6,15 @@ import DarkModeIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeIcon from '@mui/icons-material/LightModeOutlined';
 import { useColorMode } from '../theme/colorMode.ts';
 import { useAuth } from '../auth/authContext.ts';
-import { Footer, NavItem, Root, Wordmark } from './Layout.styles.ts';
+import {
+  AvatarButton,
+  Footer,
+  NavItem,
+  Root,
+  UserMenu,
+  UserMenuItem,
+  Wordmark,
+} from './Layout.styles.ts';
 
 function Layout() {
   const { mode, toggle } = useColorMode();
@@ -14,7 +23,12 @@ function Layout() {
 
   const isAuthenticated = status === 'authenticated';
 
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const menuOpen = menuAnchor !== null;
+  const closeMenu = () => setMenuAnchor(null);
+
   const handleLogout = async () => {
+    closeMenu();
     await logout();
     navigate('/');
   };
@@ -47,26 +61,26 @@ function Layout() {
             <Wordmark>Sanctum</Wordmark>
           </Box>
 
+          <NavItem to="/" end>
+            Search
+          </NavItem>
+
           {isAuthenticated && <NavItem to="/shelves">My Shelves</NavItem>}
 
           {isAuthenticated ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box
-                component={RouterLink}
-                to="/profile"
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  textDecoration: 'none',
-                }}
+            <>
+              <AvatarButton
+                onClick={(e: MouseEvent<HTMLElement>) => setMenuAnchor(e.currentTarget)}
+                aria-haspopup="true"
+                aria-expanded={menuOpen}
+                aria-label="Open account menu"
               >
                 <Avatar
                   src={user?.avatarUrl ?? undefined}
                   alt={user?.name}
                   sx={{
-                    width: 30,
-                    height: 30,
+                    width: 32,
+                    height: 32,
                     fontSize: '0.85rem',
                     bgcolor: 'background.default',
                     color: 'gilt.main',
@@ -75,38 +89,31 @@ function Layout() {
                 >
                   {user?.name?.[0]?.toUpperCase()}
                 </Avatar>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: 'text.secondary',
-                    fontStyle: 'italic',
-                    display: { xs: 'none', sm: 'block' },
+              </AvatarButton>
+              <UserMenu
+                anchorEl={menuAnchor}
+                open={menuOpen}
+                onClose={closeMenu}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                <UserMenuItem
+                  onClick={() => {
+                    closeMenu();
+                    navigate('/profile');
                   }}
                 >
-                  {user?.name}
-                </Typography>
-              </Box>
-              <NavItem
-                to="/"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleLogout();
-                }}
-                end
-              >
-                Logout
-              </NavItem>
-            </Box>
+                  Profile
+                </UserMenuItem>
+                <UserMenuItem onClick={handleLogout}>Logout</UserMenuItem>
+              </UserMenu>
+            </>
           ) : (
             <NavItem to="/login">Login</NavItem>
           )}
 
           <Tooltip title={mode === 'light' ? 'Dim the lamps' : 'Light the lamps'}>
-            <IconButton
-              onClick={toggle}
-              aria-label="toggle theme"
-              sx={{ color: 'gilt.main' }}
-            >
+            <IconButton onClick={toggle} aria-label="toggle theme" sx={{ color: 'gilt.main' }}>
               {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
             </IconButton>
           </Tooltip>
@@ -124,10 +131,7 @@ function Layout() {
         >
           “A room without books is like a body without a soul.”
         </Typography>
-        <Typography
-          variant="overline"
-          sx={{ color: 'gilt.main', display: 'block', mt: 1 }}
-        >
+        <Typography variant="overline" sx={{ color: 'gilt.main', display: 'block', mt: 1 }}>
           Cicero
         </Typography>
       </Footer>
