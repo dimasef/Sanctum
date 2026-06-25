@@ -7,10 +7,10 @@ import { formatReviewDate, MY_REVIEWS } from '../reviews/operations.ts';
 import { Container, ReviewRow, Thumb } from './MyReviewsList.styles.ts';
 
 export function MyReviewsList() {
-  const { data, loading, error } = useQuery(MY_REVIEWS);
+  const { data, loading, error } = useQuery(MY_REVIEWS, { fetchPolicy: 'cache-and-network' });
 
-  if (loading) return <CenteredSpinner mt={4} />;
-  if (error) return <Alert severity="error">{error.message}</Alert>;
+  if (loading && !data) return <CenteredSpinner mt={4} />;
+  if (error && !data) return <Alert severity="error">{error.message}</Alert>;
 
   const reviews = data?.me?.reviews ?? [];
 
