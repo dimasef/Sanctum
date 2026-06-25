@@ -1,11 +1,5 @@
 import { styled } from '@mui/material/styles';
 
-export const GiltRule = styled('div')(({ theme }) => ({
-  height: '1px',
-  background: `linear-gradient(90deg, ${theme.palette.gilt.main}, transparent)`,
-  opacity: 0.6,
-}));
-
 export const EditorCard = styled('div')(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
   borderRadius: 12,

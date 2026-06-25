@@ -3,7 +3,7 @@ import { useAuth } from '../auth/authContext.ts';
 import { Eyebrow } from './Eyebrow.tsx';
 import { MyReviewEditor } from './MyReviewEditor.tsx';
 import { ReviewCard } from './ReviewCard.tsx';
-import { GiltRule, ReviewList } from './ReviewsSection.styles.ts';
+import { ReviewList } from './ReviewsSection.styles.ts';
 import type { Review } from '../reviews/operations.ts';
 
 export function ReviewsSection({ bookId, reviews }: { bookId: string; reviews: Review[] }) {
@@ -17,8 +17,7 @@ export function ReviewsSection({ bookId, reviews }: { bookId: string; reviews: R
   const average = count ? reviews.reduce((sum, review) => sum + review.rating, 0) / count : 0;
 
   return (
-    <Box sx={{ mt: 6 }}>
-      <GiltRule sx={{ mb: 3 }} />
+    <Box>
       <Stack
         direction="row"
         spacing={2}

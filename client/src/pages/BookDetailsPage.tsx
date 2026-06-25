@@ -169,10 +169,12 @@ function BookDetailsPage() {
           >
             {blurb ?? 'No description available.'}
           </Typography>
-
-          <ReviewsSection bookId={book.id} reviews={book.reviews} />
         </InfoPanel>
       </Layout>
+
+      <InfoPanel sx={{ mt: 5 }}>
+        <ReviewsSection bookId={book.id} reviews={book.reviews} />
+      </InfoPanel>
     </Box>
   );
 }
