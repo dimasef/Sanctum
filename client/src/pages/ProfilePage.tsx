@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client/react';
-import { Alert } from '@mui/material';
+import { Alert, Stack } from '@mui/material';
 import { CenteredSpinner } from '../components/CenteredSpinner.tsx';
+import { MyReviewsList } from '../components/MyReviewsList.tsx';
 import { ME_PROFILE } from '../profile/operations.ts';
 import ProfileForm from './ProfileForm.tsx';
 
@@ -11,7 +12,12 @@ function ProfilePage() {
   if (error) return <Alert severity="error">{error.message}</Alert>;
   if (!data?.me) return null;
 
-  return <ProfileForm me={data.me} />;
+  return (
+    <Stack spacing={6}>
+      <ProfileForm me={data.me} />
+      <MyReviewsList />
+    </Stack>
+  );
 }
 
 export default ProfilePage;

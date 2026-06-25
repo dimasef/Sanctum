@@ -1,5 +1,6 @@
 import { gql, type TypedDocumentNode } from '@apollo/client';
 import type { UploadUrl } from '../lib/imageUpload.ts';
+import type { Review } from '../reviews/operations.ts';
 
 export interface Book {
   id: string;
@@ -23,6 +24,7 @@ export interface BookSearchResult {
 export interface BookDetail extends Book {
   isbn: string | null;
   hasCustomCover: boolean;
+  reviews: Review[];
 }
 
 export const BOOKS: TypedDocumentNode<{ books: Book[] }, Record<string, never>> = gql`
@@ -51,6 +53,18 @@ export const BOOK: TypedDocumentNode<{ book: BookDetail | null }, { id: string }
       publishedYear
       isbn
       hasCustomCover
+      reviews {
+        id
+        rating
+        body
+        createdAt
+        updatedAt
+        user {
+          id
+          name
+          avatarUrl
+        }
+      }
     }
   }
 `;

@@ -14,6 +14,7 @@ import {
 import { BookCover } from '../components/BookCover.tsx';
 import { CoverUploadControl } from '../components/CoverUploadControl.tsx';
 import { AddToShelfControl } from '../components/AddToShelfControl.tsx';
+import { ReviewsSection } from '../components/ReviewsSection.tsx';
 import { BOOK } from '../books/operations.ts';
 import { stripHtml } from '../books/stripHtml.ts';
 import {
@@ -168,6 +169,8 @@ function BookDetailsPage() {
           >
             {blurb ?? 'No description available.'}
           </Typography>
+
+          <ReviewsSection bookId={book.id} reviews={book.reviews} />
         </InfoPanel>
       </Layout>
     </Box>
