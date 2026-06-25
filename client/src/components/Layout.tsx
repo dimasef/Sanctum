@@ -47,9 +47,7 @@ function Layout() {
             <Wordmark>Sanctum</Wordmark>
           </Box>
 
-          {isAuthenticated && (
-            <NavItem to="/shelf">My Shelf</NavItem>
-          )}
+          {isAuthenticated && <NavItem to="/shelves">My Shelves</NavItem>}
 
           {isAuthenticated ? (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

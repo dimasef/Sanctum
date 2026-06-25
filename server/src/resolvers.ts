@@ -1,13 +1,21 @@
 import * as googleBooks from './books/googleBooks.js';
 import * as bookService from './books/book.service.js';
-import * as shelfService from './shelf/shelf.service.js';
+import * as readingStatusService from './reading-status/reading-status.service.js';
 import * as reviewService from './reviews/review.service.js';
 import { requireUserId } from './auth/guard.js';
-import type { Book, Review, Shelf, User, ShelfStatus } from './generated/prisma/client.js';
+import type {
+  Book,
+  Review,
+  ReadingStatus,
+  Shelf,
+  User,
+  ReadingState,
+} from './generated/prisma/client.js';
 import type { Context } from './context.js';
 import * as authService from './auth/auth.service.js';
 import * as s3Service from './storage/s3.service.js';
 import * as userService from './user/user.service.js';
+import * as shelfService from './shelf/shelf.service.js';
 
 export const resolvers = {
   Query: {
@@ -22,6 +30,8 @@ export const resolvers = {
     user: async (_parent: unknown, args: { id: string }, ctx: Context) =>
       ctx.prisma.user.findUnique({ where: { id: args.id } }),
     searchBooks: (_p: unknown, args: { query: string }) => googleBooks.searchBooks(args.query),
+    shelf: (_p: unknown, args: { id: string }, ctx: Context) =>
+      ctx.prisma.shelf.findFirst({ where: { id: args.id, userId: requireUserId(ctx) } }),
   },
 
   Mutation: {
@@ -37,12 +47,13 @@ export const resolvers = {
       requireUserId(ctx);
       return bookService.importBook(args.googleId);
     },
-    addToShelf: (_p: unknown, args: { bookId: string; status: ShelfStatus }, ctx: Context) =>
-      shelfService.addToShelf(requireUserId(ctx), args.bookId, args.status),
-    moveOnShelf: (_p: unknown, args: { bookId: string; status: ShelfStatus }, ctx: Context) =>
-      shelfService.moveOnShelf(requireUserId(ctx), args.bookId, args.status),
-    removeFromShelf: (_p: unknown, args: { bookId: string }, ctx: Context) =>
-      shelfService.removeFromShelf(requireUserId(ctx), args.bookId),
+    setReadingStatus: (
+      _p: unknown,
+      args: { bookId: string; status: ReadingState },
+      ctx: Context,
+    ) => readingStatusService.setReadingStatus(requireUserId(ctx), args.bookId, args.status),
+    removeReadingStatus: (_p: unknown, args: { bookId: string }, ctx: Context) =>
+      readingStatusService.removeReadingStatus(requireUserId(ctx), args.bookId),
     upsertReview: (
       _p: unknown,
       args: { bookId: string; rating: number; body?: string | null },
@@ -72,13 +83,70 @@ export const resolvers = {
       ctx.loaders.coverOverrideByBookId.clear(args.bookId);
       return ctx.prisma.book.findUnique({ where: { id: args.bookId } });
     },
+    createShelf: (
+      _p: unknown,
+      args: { input: { name: string; color: string; icon: string } },
+      ctx: Context,
+    ) =>
+      shelfService.createShelf(
+        requireUserId(ctx),
+        args.input.name,
+        args.input.color,
+        args.input.icon,
+      ),
+    updateShelf: (
+      _p: unknown,
+      args: { id: string; input: { name?: string; color?: string; icon?: string } },
+      ctx: Context,
+    ) => shelfService.updateShelf(requireUserId(ctx), args.id, args.input),
+    deleteShelf: (_p: unknown, args: { id: string }, ctx: Context) =>
+      shelfService.deleteShelf(requireUserId(ctx), args.id),
+    addBookToShelf: async (
+      _p: unknown,
+      args: { shelfId: string; bookId: string },
+      ctx: Context,
+    ) => {
+      const shelf = await shelfService.addBookToShelf(
+        requireUserId(ctx),
+        args.shelfId,
+        args.bookId,
+      );
+      ctx.loaders.booksByShelfId.clear(args.shelfId);
+      return shelf;
+    },
+    removeBookFromShelf: async (
+      _p: unknown,
+      args: { shelfId: string; bookId: string },
+      ctx: Context,
+    ) => {
+      const shelf = await shelfService.removeBookFromShelf(
+        requireUserId(ctx),
+        args.shelfId,
+        args.bookId,
+      );
+      ctx.loaders.booksByShelfId.clear(args.shelfId);
+      return shelf;
+    },
   },
 
   User: {
     createdAt: (parent: User) => parent.createdAt.toISOString(),
-    shelf: (parent: User, _a: unknown, ctx: Context) => ctx.loaders.shelvesByUserId.load(parent.id),
+    readingStatuses: (parent: User, _a: unknown, ctx: Context) =>
+      ctx.loaders.readingStatusesByUserId.load(parent.id),
     reviews: (parent: User, _a: unknown, ctx: Context) =>
       ctx.loaders.reviewsByUserId.load(parent.id),
+    shelves: (parent: User, _a: unknown, ctx: Context) =>
+      ctx.loaders.shelvesByUserId.load(parent.id),
+  },
+
+  Shelf: {
+    createdAt: (parent: Shelf) => parent.createdAt.toISOString(),
+    bookCount: async (parent: Shelf, _a: unknown, ctx: Context) =>
+      (await ctx.loaders.booksByShelfId.load(parent.id)).length,
+    books: async (parent: Shelf, _a: unknown, ctx: Context) => {
+      const items = await ctx.loaders.booksByShelfId.load(parent.id);
+      return Promise.all(items.map((item) => ctx.loaders.bookById.load(item.bookId)));
+    },
   },
   Book: {
     coverUrl: async (parent: Book, _a: unknown, ctx: Context) => {
@@ -93,10 +161,12 @@ export const resolvers = {
     reviews: (parent: Book, _a: unknown, ctx: Context) =>
       ctx.loaders.reviewsByBookId.load(parent.id),
   },
-  ShelfItem: {
-    addedAt: (parent: Shelf) => parent.addedAt.toISOString(),
-    user: (parent: Shelf, _a: unknown, ctx: Context) => ctx.loaders.userById.load(parent.userId),
-    book: (parent: Shelf, _a: unknown, ctx: Context) => ctx.loaders.bookById.load(parent.bookId),
+  ReadingStatus: {
+    addedAt: (parent: ReadingStatus) => parent.addedAt.toISOString(),
+    user: (parent: ReadingStatus, _a: unknown, ctx: Context) =>
+      ctx.loaders.userById.load(parent.userId),
+    book: (parent: ReadingStatus, _a: unknown, ctx: Context) =>
+      ctx.loaders.bookById.load(parent.bookId),
   },
   Review: {
     createdAt: (parent: Review) => parent.createdAt.toISOString(),

@@ -15,12 +15,13 @@ Full spec: see [`docs/TECH_SPEC.md`](docs/TECH_SPEC.md).
 
 ## Working agreement
 
-- **The developer writes all the code themselves.** Claude provides detailed,
-  step-by-step instructions and explanations, and answers questions along the way.
-  Do NOT write large chunks of code for the developer unless explicitly asked —
-  the point is learning.
-- For each step, explain *what* we do, *why*, and *how it tends to be asked in
-  interviews*.
+- **Claude writes all the code** (frontend + backend + infra). The developer
+  drives product: ideas, priorities, decisions, and review. The original
+  backend-learning goal (stages 0–10) is complete, so the teaching/"developer
+  writes it" rule no longer applies.
+- Still explain *what* and *why* concisely when it aids review or a decision —
+  but default to implementing, not instructing. Surface trade-offs and let the
+  developer choose direction.
 - **Language rule:** chat with the developer may be in Russian/Ukrainian, but
   ALL documentation, code, comments, and committed artifacts MUST be in English.
 
